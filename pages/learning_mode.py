@@ -138,6 +138,12 @@ def shuffle_and_restart():
     st.session_state.learning_showed_answer = False
     st.session_state.learning_selected_options = {}
 
+# 문제 번호 클릭 시 해당 문제로 이동하는 함수 추가
+def go_to_question(index):
+    st.session_state.current_learning_index = index
+    st.session_state.learning_showed_answer = False
+    st.session_state.learning_selected_options = {}
+
 # 메인 앱 UI - 학습 모드
 st.title("🎓 학습 모드")
 
@@ -153,6 +159,31 @@ with st.sidebar:
         st.session_state.current_learning_index = 0
         st.session_state.learning_showed_answer = False
         st.session_state.learning_selected_options = {}
+    
+    # 문제 번호 목록 추가
+    st.divider()
+    st.write("### 문제 목록")
+    
+    # 스크롤 가능한 컨테이너 내에 문제 번호 나열
+    with st.container(height=300):
+        for i, q in enumerate(st.session_state.learning_questions):
+            # 현재 문제에 표시 추가
+            if i == st.session_state.current_learning_index:
+                button_label = f"➡️ 문제 {i+1} (현재)"
+                button_type = "primary"
+            else:
+                button_label = f"문제 {i+1}"
+                button_type = "secondary"
+            
+            # 문제 번호 버튼
+            st.button(
+                button_label, 
+                key=f"q_nav_{i}", 
+                on_click=go_to_question, 
+                args=(i,),
+                type=button_type,
+                use_container_width=True
+            )
     
     st.divider()
     st.write("### 현재 상태")

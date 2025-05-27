@@ -3,6 +3,7 @@ import json
 import random
 import pandas as pd
 import os
+import uuid
 
 # 페이지 기본 설정
 st.set_page_config(
@@ -74,6 +75,38 @@ def shuffle_questions(questions):
     shuffled = questions.copy()
     random.shuffle(shuffled)
     return shuffled
+
+# 세션 상태를 파일에 저장하는 함수
+def save_session_state(session_id):
+    session_data = {k: v for k, v in st.session_state.items() 
+                   if isinstance(v, (str, int, float, bool, list, dict))}
+    
+    os.makedirs("session_data", exist_ok=True)
+    with open(f"session_data/session_{session_id}.json", "w") as f:
+        json.dump(session_data, f)
+
+# 세션 상태를 파일에서 로드하는 함수
+def load_session_state(session_id):
+    try:
+        with open(f"session_data/session_{session_id}.json", "r") as f:
+            saved_data = json.load(f)
+            for k, v in saved_data.items():
+                if k not in st.session_state:
+                    st.session_state[k] = v
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+# 앱 시작 부분에서 세션 식별자 생성 또는 가져오기
+if 'session_id' not in st.session_state:
+    # 수정된 부분: st.experimental_user 대신 간단한 고유 ID 생성
+    st.session_state.session_id = "user_" + str(uuid.uuid4())
+    
+# 저장된 세션 로드
+load_session_state(st.session_state.session_id)
+
+# 앱 종료 시 세션 저장 (페이지 변경 시마다 저장)
+def on_change():
+    save_session_state(st.session_state.session_id)
 
 # 세션 상태 초기화
 if 'questions' not in st.session_state:
@@ -160,3 +193,7 @@ with col2:
 
 # 푸터
 st.divider()
+
+# 세션 저장 트리거 버튼 (선택사항)
+if st.button("세션 저장", on_click=on_change):
+    st.success("세션이 저장되었습니다!")
