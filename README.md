@@ -40,6 +40,7 @@ streamlit run app.py
 ## 문제 데이터 설정
 
 문제 데이터는 `questions.json` 파일에 JSON 형식으로 저장되어 있습니다. 다음과 같은 형식으로 문제를 추가하거나 수정할 수 있습니다:
+현재 github에는 보안상 `questions.json` 파일을 업로드 하지 않았습니다. 
 
 ```json
 [
